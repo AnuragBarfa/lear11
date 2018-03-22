@@ -12,10 +12,10 @@ class CommentForm(forms.ModelForm):
 
     class Meta:
         model = Comment
-        fields = ('author', 'text',)
+        fields = ('text',)
 
-class ProfileForm(forms.ModelForm):
+class AlumniProfileForm(forms.ModelForm):
 
     class Meta:
         model=Alumni
-        fields=('name','profile_img','fb_link','ln_link','curr_work','prev_work',)
+        fields=('name','roll_no','profile_img','passout_year','phone_no','fb_link','ln_link','email_link','curr_work','prev_work',)

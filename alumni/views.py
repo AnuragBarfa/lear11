@@ -2,6 +2,7 @@ from django.shortcuts import render ,get_object_or_404 ,redirect
 from django.template.defaultfilters import length
 from django.utils import timezone
 from .models import Post,Comment,Alumni
+from student.models import Student
 from .forms import PostForm,CommentForm
 from django.contrib.auth.decorators import login_required,permission_required
 from django.db.models import Q
@@ -11,6 +12,7 @@ from django.db.models import Q
 @login_required
 def alumni_list(request):
     alumnis=Alumni.objects.all()
+    posts = Post.objects.filter(published_date__isnull=False).order_by('created_date')
     unapprovedposts = Post.objects.filter(approved_post=False).order_by('created_date')
     unpublishedposts = Post.objects.filter(published_date__isnull=True).order_by('created_date')
     if len(unapprovedposts) - len(unpublishedposts) >= 0:
@@ -23,8 +25,8 @@ def alumni_list(request):
         alumnis=alumnis.filter(
             Q(name__icontains=query)
             ).distinct()
-        return render(request, 'alumni/alumni_list.html', {'alumnis': alumnis, 'approvalpending': approvalpending})
-    return render(request, 'alumni/alumni_list.html', {'alumnis': alumnis, 'approvalpending': approvalpending})
+        return render(request, 'alumni/alumni_list.html', {'alumnis': alumnis,'posts':posts, 'approvalpending': approvalpending})
+    return render(request, 'alumni/alumni_list.html', {'alumnis': alumnis,'posts':posts, 'approvalpending': approvalpending})
 
 @login_required
 def alumni_detail(request ,pk):
@@ -43,22 +45,55 @@ def alumni_detail(request ,pk):
 @login_required
 def post_list(request):
     posts = Post.objects.filter(published_date__isnull=False).order_by('created_date')
+    posts=posts[::-1]#for reversing the array
     unapprovedposts = Post.objects.filter(approved_post=False).order_by('created_date')
     unpublishedposts = Post.objects.filter(published_date__isnull=True).order_by('created_date')
     if len(unapprovedposts)-len(unpublishedposts)>=0:
         approvalpending=len(unapprovedposts)-len(unpublishedposts)
     else:
         approvalpending=0
-    return render(request, 'post/post_list.html', {'posts': posts,'approvalpending':approvalpending})
+    group = request.user.groups.all()
+    for g in group:
+        if g.name == "Student":
+            person = get_object_or_404(Student, user=request.user)
+        else:
+            # print("in alumni")
+            person = get_object_or_404(Alumni, user=request.user)
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            #group = request.user.groups.all()
+            #for g in group:
+                # if g.name == "Student":
+                #     person = get_object_or_404(Student, user=request.user)
+                # else:
+                #     # print("in alumni")
+                #     person = get_object_or_404(Alumni, user=request.user)
+            comment = form.save(commit=False)
+            comment.author = request.user.first_name+" "+request.user.last_name
+            comment.author_image = person.profile_img
+            comment.post = get_object_or_404(Post,pk=request.POST["butt"])
+            comment.save()
+            return redirect('alumni:post_list')
+    else:
+        form = CommentForm()
+    return render(request, 'post/post_list.html', {'form':form,'posts': posts,'approvalpending':approvalpending,'person':person})
 
 @login_required
 def post_new(request):
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
+            group = request.user.groups.all()
+            for g in group:
+                if g.name == "Student":
+                    person =get_object_or_404(Student,user=request.user)
+                else:
+                    # print("in alumni")
+                    person =get_object_or_404(Alumni,user=request.user)
             post = form.save(commit=False)
             post.author = request.user
-
+            post.author_image=person.profile_img
             post.save()
             posts = Post.objects.all()
             return redirect('alumni:post_detail', pk=post.pk)
@@ -75,39 +110,48 @@ def post_new(request):
 @login_required
 def post_edit(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    if request.method == "POST":
-        form = PostForm(request.POST, instance=post)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.published_date = timezone.now()
-            post.save()
-            unapprovedposts = Post.objects.filter(approved_post=False).order_by('created_date')
-            return redirect('alumni:post_detail', pk=post.pk)
+    user_all_post=Post.objects.filter(author=request.user)
+    if post in user_all_post:
+        if request.method == "POST":
+            form = PostForm(request.POST, instance=post)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user
+                # post.published_date = timezone.now()
+                post.save()
+                unapprovedposts = Post.objects.filter(approved_post=False).order_by('created_date')
+                return redirect('alumni:post_detail', pk=post.pk)
+        else:
+            form = PostForm(instance=post)
+        unapprovedposts = Post.objects.filter(approved_post=False).order_by('created_date')
+        unpublishedposts = Post.objects.filter(published_date__isnull=True).order_by('created_date')
+        if len(unapprovedposts) - len(unpublishedposts) >= 0:
+            approvalpending = len(unapprovedposts) - len(unpublishedposts)
+        else:
+            approvalpending = 0
+        return render(request, 'post/post_edit.html', {'form': form,'approvalpending':approvalpending,})
     else:
-        form = PostForm(instance=post)
-    unapprovedposts = Post.objects.filter(approved_post=False).order_by('created_date')
-    unpublishedposts = Post.objects.filter(published_date__isnull=True).order_by('created_date')
-    if len(unapprovedposts) - len(unpublishedposts) >= 0:
-        approvalpending = len(unapprovedposts) - len(unpublishedposts)
-    else:
-        approvalpending = 0
-    return render(request, 'post/post_edit.html', {'form': form,'approvalpending':approvalpending,})
+        return render(request,'post/error.html')    
 
 @login_required
 def post_detail(request,pk):
     post = get_object_or_404(Post, pk=pk)
+    user_all_post=Post.objects.filter(author=request.user)
+    user_post=0
+    if(post in user_all_post):user_post=1
+    print(user_post)
     unapprovedposts = Post.objects.filter(approved_post=False).order_by('created_date')
     unpublishedposts = Post.objects.filter(published_date__isnull=True).order_by('created_date')
     if len(unapprovedposts) - len(unpublishedposts) >= 0:
         approvalpending = len(unapprovedposts) - len(unpublishedposts)
     else:
         approvalpending = 0
-    return render(request, 'post/post_details.html', {'post': post,'approvalpending':approvalpending,})
+    return render(request, 'post/post_details.html', {'post': post,'approvalpending':approvalpending,'user_post':user_post,})
 
 @login_required
 def post_draft_list(request):
     posts = Post.objects.filter(published_date__isnull=True).order_by('created_date')
+    posts = posts.filter(author = request.user)
     unapprovedposts = Post.objects.filter(approved_post=False).order_by('created_date')
     unpublishedposts = Post.objects.filter(published_date__isnull=True).order_by('created_date')
     if len(unapprovedposts) - len(unpublishedposts) >= 0:
@@ -119,14 +163,22 @@ def post_draft_list(request):
 @login_required
 def post_publish(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    post.publish()
-    return redirect('alumni:post_detail',pk=pk)
+    users_all_post = Post.objects.filter(author=request.user)
+    if (post in users_all_post):
+        post.publish()
+        return redirect('alumni:post_detail',pk=pk)
+    else:
+        return render(request, 'post/error.html')
 
 @login_required
 def post_remove(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    post.delete()
-    return redirect('alumni:post_list')
+    users_all_post = Post.objects.filter(author=request.user)
+    if (post in users_all_post):
+        post.delete()
+        return redirect('alumni:post_list')
+    else:
+        return render(request, 'post/error.html')
 
 @login_required
 def add_comment_to_post(request, pk):
@@ -134,7 +186,16 @@ def add_comment_to_post(request, pk):
     if request.method == "POST":
         form = CommentForm(request.POST)
         if form.is_valid():
+            group = request.user.groups.all()
+            for g in group:
+                if g.name == "Student":
+                    person =get_object_or_404(Student,user=request.user)
+                else:
+                    # print("in alumni")
+                    person =get_object_or_404(Alumni,user=request.user)
             comment = form.save(commit=False)
+            comment.author = request.user.first_name+" "+request.user.last_name
+            comment.author_image=person.profile_img
             comment.post = post
             comment.save()
             return redirect('alumni:post_detail' ,pk=post.pk)

@@ -1,22 +1,23 @@
-import urllib2
+import urllib3
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group, User
 
-from alumni.forms import ProfileForm
+from alumni.forms import AlumniProfileForm
+from student.forms import StudentProfileForm
 from alumni.models import Alumni
+from student.models import Student
 from .forms import UserForm
 
 from lxml import html
 import csv, os, json
 import requests
-from exceptions import ValueError
 from django.utils import timezone
-from selenium import webdriver
+#from selenium import webdriver
 import bs4 as bs
-import urllib
+import urllib3
 # Create your views here.
 def home(request):
     return render(request,'home/index.html')
@@ -24,6 +25,9 @@ def about_us(request):
     return render(request,'home/about.html')
 def team(request):
     return render(request,'home/team.html')
+def events(request):
+    return render(request,'home/events.html')
+
 
 ########### views for user accounts
 def register(request):
@@ -31,8 +35,13 @@ def register(request):
     if form.is_valid():
         user = form.save(commit=False)
         username = form.cleaned_data['username']
+        email=form.cleaned_data["email"]
         password = form.cleaned_data['password']
-        name = form.cleaned_data["name"]
+        first_name = form.cleaned_data["first_name"]
+        last_name = form.cleaned_data["last_name"]
+        name=first_name+" "+last_name
+        phone_no=form.cleaned_data["phone_no"]
+        email_link=form.cleaned_data["email"]
         ln_link = form.cleaned_data["ln_link"]
         fb_link = form.cleaned_data["fb_link"]
         curr_work = form.cleaned_data["curr_work"]
@@ -41,10 +50,16 @@ def register(request):
         user.set_password(password)
         user.save()
         user = authenticate(username=username, password=password)
+        #print(group)
         my_group = Group.objects.get(name=group)
-        new_Alumni=Alumni.objects.create(user=user,name=name,roll_no=username,ln_link=ln_link,fb_link=fb_link,curr_work = curr_work,prev_work=pre_work)
-        new_Alumni.save()
         my_group.user_set.add(user)
+        if group=="Alumni":
+            new_Alumni=Alumni.objects.create(user=user,name=name,roll_no=username,phone_no=phone_no,email_link=email_link,ln_link=ln_link,fb_link=fb_link,curr_work = curr_work,prev_work=pre_work)
+            new_Alumni.save()
+        else :
+            new_Student = Student.objects.create(user=user, name=name, roll_no=username, phone_no=phone_no,email_link=email, ln_link=ln_link, fb_link=fb_link, curr_work=curr_work,prev_work=pre_work)
+            new_Student.save()
+
         if user is not None:
             if user.is_active:
                 login(request, user)
@@ -58,6 +73,7 @@ def register(request):
 @permission_required('polls.can_vote')
 def update_user(request):
     alumni=Alumni.objects.all()
+    student=Student.objects.all()
     cur_year=(timezone.now().year)/100
     for user1 in alumni:
         admi_date = (user1.roll_no) / 10000000
@@ -76,8 +92,18 @@ def update_user(request):
 
 @login_required
 def profile(request):
-    alumni = Alumni.objects.filter(user=request.user)
-    return render(request,'registration/profile.html',{'alumni':alumni})
+    group=request.user.groups.all()
+    us = request.user
+    no_of_posts_by_user = len(us.post_set.all())
+    print(group)
+    for g in group:
+        if g.name=="Student":
+            person=Student.objects.filter(user=request.user)
+        else :
+            #print("in alumni")
+            person = Alumni.objects.filter(user=request.user)
+    #print(person)
+    return render(request,'registration/profile.html',{'alumni':person,'no_of_posts_by_user':no_of_posts_by_user})
 @login_required
 def profile_edit_manual(request):
     # # driver = webdriver.Firefox(executable_path=r'your\path\geckodriver.exe')  # I actually used the chromedriver and did not test firefox, but it should work.
@@ -87,21 +113,37 @@ def profile_edit_manual(request):
     # # soup = bs.BeautifulSoup(html,'lxml')  # specify parser or it will auto-select for you
     # # summary = soup.find('section', {"id": "summary"})
     # # print (summary.getText())
-    urlopener = urllib2.build_opener()
-    urlopener.addheaders = [('User-agent', 'Mozilla/5.0')]
-    sauce = urlopener.open('https://www.linkedin.com/in/deepakgouda/').read()
-    #sauce = urllib2.urlopen('https://www.linkedin.com/in/ashish-ranjan-753429136/').read()
-    soup=bs.BeautifulSoup(sauce,'lxml')
-    print(soup)
-    alumni=get_object_or_404(Alumni, user=request.user)
-    if request.method == "POST":
-        form = ProfileForm(request.POST,instance=alumni)
-        if form.is_valid():
-            alumni = form.save(commit=False)
-            alumni.save()
-            return redirect('home:profile')
-    else:
-        form = ProfileForm()
+    #urlopener = urllib3.build_opener()
+    #urlopener.addheaders = [('User-agent', 'Mozilla/5.0')]
+    #sauce = urlopener.open('https://www.linkedin.com/in/deepakgouda/').read()
+    #sauce = urllib3.urlopen('https://www.linkedin.com/in/ashish-ranjan-753429136/').read()
+    #soup=bs.BeautifulSoup(sauce,'lxml')
+    #print(soup)
+    group = request.user.groups.all()
+    for g in group:
+        if g.name=="Student":
+            student = get_object_or_404(Student, user=request.user)
+            if request.method == "POST":
+                #for taking image input write enctype="multipart/form-data" in form in html and request.FILES in form in view
+                form = StudentProfileForm(request.POST,request.FILES, instance=student)
+                if form.is_valid():
+                    student = form.save(commit=False)
+                    student.save()
+                    return redirect('home:profile')
+            else:
+                form = StudentProfileForm({'name':student.name,'roll_no':student.roll_no,'profile_img':student.profile_img,'passout_year':student.passout_year,'phone_no':student.phone_no,'fb_link':student.fb_link,'ln_link':student.ln_link,'email_link':student.email_link,'curr_work':student.curr_work,'prev_work':student.prev_work})
+
+        else :
+            alumni = get_object_or_404(Alumni, user=request.user)
+            if request.method == "POST":
+                form = AlumniProfileForm(request.POST,request.FILES, instance=alumni)
+                if form.is_valid():
+                    alumni = form.save(commit=False)
+                    alumni.save()
+                    return redirect('home:profile')
+            else:
+                form = AlumniProfileForm({'name':alumni.name, 'roll_no':alumni.roll_no, 'profile_img':alumni.profile_img, 'passout_year':alumni.passout_year, 'phone_no':alumni.phone_no, 'fb_link':alumni.fb_link, 'ln_link':alumni.ln_link, 'email_link':alumni.email_link, 'curr_work':alumni.curr_work, 'prev_work':alumni.prev_work})
+
     return render(request, 'registration/edit_profile.html', {'form': form,})
 def profile_edit_linkdin(request):
     # # driver = webdriver.Firefox(executable_path=r'your\path\geckodriver.exe')  # I actually used the chromedriver and did not test firefox, but it should work.
@@ -111,10 +153,10 @@ def profile_edit_linkdin(request):
     # # soup = bs.BeautifulSoup(html,'lxml')  # specify parser or it will auto-select for you
     # # summary = soup.find('section', {"id": "summary"})
     # # print (summary.getText())
-    urlopener = urllib2.build_opener()
+    urlopener = urllib3.build_opener()
     urlopener.addheaders = [('User-agent', 'Mozilla/5.0')]
     sauce = urlopener.open('https://www.linkedin.com/in/aditya-mittal-709a1162/').read()
-    #sauce = urllib2.urlopen('https://www.linkedin.com/in/ashish-ranjan-753429136/').read()
+    #sauce = urllib3.urlopen('https://www.linkedin.com/in/ashish-ranjan-753429136/').read()
     soup=bs.BeautifulSoup(sauce,'lxml')
     tag1=soup.findAll('ul')
     #data=soup.findAll('section' ,attrs={'class':'profile-section','id':'topcard'})
@@ -161,7 +203,7 @@ def linkedin_companies_parser(url):
             headers = {
                 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36'
             }
-            print "Fetching :", url
+            print ("Fetching :", url)
             response = requests.get(url, headers=headers, verify=False)
             formatted_response = response.content.replace('<!--', '').replace('-->', '')
             doc = html.fromstring(formatted_response)
@@ -234,16 +276,16 @@ def linkedin_companies_parser(url):
                     }
                     return data
                 except:
-                    print "cant parse page", url
+                    print ("cant parse page", url)
 
             # Retry in case of captcha or login page redirection
             if len(response.content) < 2000 or "trk=login_reg_redirect" in url:
                 if response.status_code == 404:
-                    print "linkedin page not found"
+                    print ("linkedin page not found")
                 else:
-                    raise ValueError('redirecting to login page or captcha found')
+                    raise Exception('redirecting to login page or captcha found')
         except:
-            print "retrying :", url
+            print ("retrying :", url)
 
 
 def readurls():

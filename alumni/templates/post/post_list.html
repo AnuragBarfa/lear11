@@ -3,31 +3,84 @@
 {% block content %}
     {% for post in posts %}
         {% if post.approved_post %}
-            <div class="post">
-                <div class="date">
-                    {{ post.published_date }}
-                </div>
-                <h1><a href="{% url 'alumni:post_detail' pk=post.pk %}">{{ post.title }}</a></h1>
-                <p>{{ post.text|linebreaksbr }}</p>
-                <a href="{% url 'alumni:post_detail' pk=post.pk %}">Comments: {{ post.approved_comments.count }}</a>
-                {% for comment in post.comments.all %}
-                    {% if user.is_authenticated or comment.approved_comment %}
-                    <div class="comment">
-                        <div class="date">
-                            {{ comment.created_date }}
-                            {% if not comment.approved_comment %}
-                                <a class="btn btn-default" href="{% url 'alumni:comment_remove' pk=comment.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
-                                <a class="btn btn-default" href="{% url 'alumni:comment_approve' pk=comment.pk %}"><span class="glyphicon glyphicon-ok"></span></a>
-                            {% endif %}
-                        </div>
-                        <strong>{{ comment.author }}</strong>
-                        <p>{{ comment.text|linebreaks }}</p>
+            <div class="w3-card-8 post" style="padding:25px;width:1100px;" >
+                <!--header-->
+                <div>
+                    <div style="display:inline-block;vertical-align: middle;margin:5px;">
+                        <img src="{{ post.author_image.url }}"  style="height:60px;width:60px;border-radius: 50%;"/>
                     </div>
-                    {% endif %}
-                {% empty %}
-                    <p>No comments here yet :(</p>
-                {% endfor %}
+                    <div style="display:inline-block;vertical-align: middle;">
+                        {{post.author.first_name}} {{post.author.last_name}} <br>
+                        {{ post.published_date }}
+                    </div>
+                </div>
+                <!--post-->
+                <h3 style = "margin-bottom: 8px;" align = "center"><a href="{% url 'alumni:post_detail' pk=post.pk %}"><strong>{{ post.title }}</strong></a></h3>
+                <div class="read_more_less1">
+                    <p>{{ post.text|linebreaks }}</p>
+                </div>
+                <!--commentbox-->
+                <div>
+                    <a href="{% url 'alumni:post_detail' pk=post.pk %}">Comments: {{ post.approved_comments.count }}</a>
+                    <form method="POST" class="post-form">
+                        {% csrf_token %}
+                        <div>
+                            <div style="display:inline-block;vertical-align: middle;margin:5px;">
+                                <img src="{{ person.profile_img.url }}"  style="height:50px;width:50px;border-radius: 50%;"/>
+                            </div>
+                            <div  style="width:70%;display:inline-block;vertical-align: middle;">
+                                <input style="border-radius: 50px;"type="text" name="text" value="" placeholder="Write a comment..." class="form-control" />
+                            </div>
+                            <div  style="display:inline-block;vertical-align: middle;margin:5px;">
+                                <button type = "submit" name="butt" value = "{{post.pk}}" class="btn btn-round ">Send</a></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!--comments-->
+                <div class="try container">
+                    {% for comment in post.comments.all|slice:":3" %}
+                        {% if user.is_authenticated or comment.approved_comment %}
+                        <div class="comment">
+                            <div class="col-md-1">
+                                <img src="{{ comment.author_image.url }}"  style="height:50px;width:50px;border-radius: 50%;"/>
+                            </div>
+                            <div class="col-md-11">
+                                <strong>{{ comment.author }} | </strong>{{ comment.created_date }}
+                                {{ comment.text|linebreaks }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% empty %}
+                        <p>No comments here yet :(</p>
+                    {% endfor %}
+                </div>
+                <div class="read_more_less2 container" >
+                    {% for comment in post.comments.all|slice:"3:"%}
+                        {% if user.is_authenticated or comment.approved_comment %}
+                        <div class="comment">
+                            <div class="col-md-1">
+                                <img src="{{ comment.author_image.url }}"  style="height:50px;width:50px;border-radius: 50%;"/>
+                            </div>
+                            <div class="col-md-11">
+                                <strong>{{ comment.author }}  </strong>{{ comment.created_date }}
+                                {{ comment.text|linebreaks }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% if post.comments.all|slice:"3:" %}
+                    <input type="button" class="hide1" value="View all comments" >
+                {% endif %}
+                <!--<button class="hide1">Read More</button>-->
+
+                <!--<button class="show1">Show</button>-->
             </div>
+            <br><br>
         {% endif %}
     {% endfor %}
 {% endblock content %}
+{% block scriptbase %}
+
+{% endblock %}

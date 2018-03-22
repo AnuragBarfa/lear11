@@ -1,7 +1,7 @@
 {% extends 'alumni/baseuser.html' %}
 
 {% block content %}
-    <div class="search_box pull-right">
+    <div class="search_box "style="width:200px;margin:auto;">
         <form class="navbar-form navbar-left" role="search" method="get" action="{% url 'alumni:alumni_list' %}">
             <div class="form-group">
                 <input type="text" class="form-control" placeholder="Search" name="q" value="{{ request.GET.q }}">
@@ -9,10 +9,57 @@
             <!--<button type="submit" class="btn btn-default">Search</button>-->
         </form>
      </div>
-    {% for alumni in alumnis %}
-    <a href="{% url 'alumni:alumni_detail' pk=alumni.pk %}">{{alumni.name}}</a><br>
-        <img src="{{ alumni.profile_img.url }}"  alt="imagewas" width="150px" height="150px"  />
-        {{alumni.passout_year}}<br>
-        {{alumni.curr_work}}<br>
-    {% endfor %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <table id="example" class="table table-striped table-bordered table-responsive" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Passout Year</th>
+                            <th>Email</th>
+                            <th>Linkdean</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Name</th>
+                            <th>Passout Year</th>
+                            <th>Email</th>
+                            <th>Linkdean</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        {% for alumni in alumnis %}
+                            <tr>
+                                <td><a href="{% url 'alumni:alumni_detail' pk=alumni.pk %}" style="text-decoration:none;color:black;">{{alumni.name}}</a></td>
+                                <td>{{alumni.passout_year}}</td>
+                                <td>{{alumni.email_link}}</td>
+                                <td>{{alumni.ln_link}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-1">
+
+            </div>
+            <div class="col-md-3">
+                <a href="{% url 'alumni:post_list' %}" style="text-decoration:none;text-align:center;"><h2>AlumBook</h2></a>
+                {% for post in posts %}
+                    <h4 style = "margin-bottom: 8px;" ><a href="{% url 'alumni:post_detail' pk=post.pk %}">{{ post.title }}</a></h4>
+                    {{post.text|slice:":30"}}....
+                    <br>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!--{% for alumni in alumnis %}-->
+    <!--<a href="{% url 'alumni:alumni_detail' pk=alumni.pk %}">{{alumni.name}}</a><br>-->
+        <!--<img src="{{ alumni.profile_img.url }}"  alt="imagewas" width="150px" height="150px"  />-->
+        <!--{{alumni.passout_year}}<br>-->
+        <!--{{alumni.curr_work}}<br>-->
+    <!--{% endfor %}-->
+
 {% endblock %}
