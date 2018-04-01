@@ -1,8 +1,8 @@
 {% extends "home/unknownbase.html" %}
 {% load static %}
 {% block body %}
-    <!-- <br><br><br>
-    {% for us in alumni %}
+     <br><br><br>
+    <!--{% for us in alumni %}
         {{ us.name }}<br>
         {{ us.roll_no}}<br>
         {{ us.fb_link }}<br>
@@ -14,109 +14,81 @@
     {% endfor %} -->
     {% for us in alumni %}
     <!-- CTA -->
-    <section id="cta1" class="wrapper">
-        <div class="container">
-            <div class="content-center">
+    <div class="container ">
+        <a href="{% url 'home:profile_edit_manual' %}" class = "btn-round" style="margin-right:5px;text-decoration: none; background-color: gray;"><span style="color: black;"><i class="icon fa-edit"></i> &nbsp;Edit Profile </span></a>
+        <a href="{% url 'password_reset' %}" class = "btn-round" style="margin-left:5px;text-decoration: none; background-color: gray;"><span style="color: black;"><i class="icon fa-key"></i> Change Password </span></a>
+        <br><br>
+        <div class="row">
+            <div class="col-md-4 w3-dark-grey w3-card-8" align="center" style="border:solid;padding:15px;">
                 <div class="photo-container">
-                    <img width="300px" height="300px" class="mx-auto rounded-circle img-raised" src="{{ us.profile_img.url }}" alt="Profile Image">
+                    <img width="200px" height="200px" class="mx-auto rounded-circle img-raised" src="{{ us.profile_img.url }}" alt="Profile Image">
                 </div>
-                <h3 class="title">{{ us.name }}</h3>
-                <p class="category">{{ us.curr_work }}</p>
+                <br>
+                <h3 class="title" style="color:white;">{{ us.name }}</h3>
+                <p class="category" style="color:white;">{{ us.curr_work }}</p>
                 <div style = "text-align: center;" class="content-center">
-                    <div class="social-description">
-                        <h2>{{no_of_posts_by_user}}</h2>
-                        <p>Posts</p>
-                    </div>
+                    <h2 style="color:white;">{{no_of_posts_by_user}}</h2>
+                    <p style="color:white;">Post(s)</p>
+                </div>
+                <div class="social-line">
+                    <a href="{{ us.fb_link }}" style = "color: #3b5998;" class="btn btn-neutral btn-icon btn-round" target="blank">
+                        <i class="fa fa-facebook-square"></i>
+                    </a>
+                    <a href="{{ us.ln_link }}" style = "color: #3b5998;" class="btn btn-neutral btn-icon btn-lg btn-round" target="blank">
+                        <i class="fa fa-linkedin"></i>
+                    </a>
+                    <a href="https://mail.google.com/mail/u/0/?view=cm&fs=1&to={{us.email_link}}" style = "color: red;" class="btn btn-neutral btn-icon btn-round" target="blank">
+                        <i class="fa fa-envelope"></i>
+                    </a>
                 </div>
             </div>
-            <div class="social-line">
-                <a href="{{ us.fb_link }}" style = "color: #3b5998;" class="btn btn-neutral btn-icon btn-round">
-                    <i class="fa fa-facebook-square"></i>
-                </a>
-                <a href="{{ us.ln_link }}" style = "color: #3b5998;" class="btn btn-neutral btn-icon btn-lg btn-round">
-                    <i class="fa fa-linkedin"></i>
-                </a>
-                <a href="#pablo" style = "color: red;" class="btn btn-neutral btn-icon btn-round">
-                    <i class="fa fa-envelope"></i>
-                </a>
+            <div class="col-md-1">
+
             </div>
-        </div>
-    </section>
-    <a href="{% url 'home:profile_edit_manual' %}" class = "btn-round" style="text-decoration: none; background-color: gray;"><span style="color: black;"><i class="icon fa-edit"></i> &nbsp;Edit Profile </span></a>
-        <div class="section">
-            <div class="container">
-                <h2>About me</h2>
-                <h5>An artist of considerable range, Ryan — the name taken by Melbourne-raised, Brooklyn-based Nick Murphy — writes, performs and records all of his own music, giving it a warm, intimate feel with a solid groove structure. An artist of considerable range.</h5>
-                <div class="row">
-                    <div class="col-md-6 ml-auto mr-auto">
-                        <h4 class="title text-center">My Portfolio</h4>
-                        <div class="nav-align-center">
-                            <ul class="nav nav-pills nav-pills-primary" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" href="#profile" role="tablist">
-                                        <i class="now-ui-icons design_image"></i>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-toggle="tab" href="#home" role="tablist">
-                                        <i class="now-ui-icons location_world"></i>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" href="#messages" role="tablist">
-                                        <i class="now-ui-icons sport_user-run"></i>
-                                    </a>
-                                </li>
-                            </ul>
+            <div class="col-md-7">
+                <div align="center">
+                    <h2>My Posts</h2>
+                </div>
+                <div style="overflow: scroll;">
+                    {% for post in my_posts %}
+                        <div class="w3-panel w3-pale-blue w3-leftbar  w3-border-blue">
+                            <h4 style = "margin-bottom: 8px;" ><a href="{% url 'alumni:post_detail' pk=post.pk %}">{{ post.title }}</a></h4>
+                            {{post.text|slice:":30"}}....
                         </div>
-                    </div>
-                    <!-- Tab panes -->
-                    <div class="tab-content gallery">
-                        <div class="tab-pane active" id="home" role="tabpanel">
-                            <div class="col-md-10 ml-auto mr-auto">
-                                <div class="row collections">
-                                    <div class="col-md-6">
-                                        <img src="../assets/img/bg1.jpg" alt="" class="img-raised">
-                                        <img src="../assets/img/bg3.jpg" alt="" class="img-raised">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <img src="../assets/img/bg8.jpg" alt="" class="img-raised">
-                                        <img src="../assets/img/bg7.jpg" alt="" class="img-raised">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="profile" role="tabpanel">
-                            <div class="col-md-10 ml-auto mr-auto">
-                                <div class="row collections">
-                                    <div class="col-md-6">
-                                        <img src="../assets/img/bg6.jpg" class="img-raised">
-                                        <img src="../assets/img/bg11.jpg" alt="" class="img-raised">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <img src="../assets/img/bg7.jpg" alt="" class="img-raised">
-                                        <img src="../assets/img/bg8.jpg" alt="" class="img-raised">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="messages" role="tabpanel">
-                            <div class="col-md-10 ml-auto mr-auto">
-                                <div class="row collections">
-                                    <div class="col-md-6">
-                                        <img src="../assets/img/bg3.jpg" alt="" class="img-raised">
-                                        <img src="../assets/img/bg8.jpg" alt="" class="img-raised">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <img src="../assets/img/bg7.jpg" alt="" class="img-raised">
-                                        <img src="../assets/img/bg6.jpg" class="img-raised">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
+    </div>
+    <br>
+    <!--<section id="cta1" class="wrapper">-->
+        <!--<div class="container">-->
+            <!--<div class="content-center">-->
+                <!--<div class="photo-container">-->
+                    <!--<img width="200px" height="200px" class="mx-auto rounded-circle img-raised" src="{{ us.profile_img.url }}" alt="Profile Image">-->
+                <!--</div>-->
+                <!--<h3 class="title">{{ us.name }}</h3>-->
+                <!--<p class="category">{{ us.curr_work }}</p>-->
+                <!--<div style = "text-align: center;" class="content-center">-->
+                    <!--<div class="social-description">-->
+                        <!--<h2>{{no_of_posts_by_user}}</h2>-->
+                        <!--<p>Posts</p>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="social-line">-->
+                <!--<a href="{{ us.fb_link }}" style = "color: #3b5998;" class="btn btn-neutral btn-icon btn-round" target="blank">-->
+                    <!--<i class="fa fa-facebook-square"></i>-->
+                <!--</a>-->
+                <!--<a href="{{ us.ln_link }}" style = "color: #3b5998;" class="btn btn-neutral btn-icon btn-lg btn-round" target="blank">-->
+                    <!--<i class="fa fa-linkedin"></i>-->
+                <!--</a>-->
+                <!--<a href="#" style = "color: red;" class="btn btn-neutral btn-icon btn-round">-->
+                    <!--<i class="fa fa-envelope"></i>-->
+                <!--</a>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</section>-->
+
         {% endfor %}
 {% endblock %}

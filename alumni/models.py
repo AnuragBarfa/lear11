@@ -65,3 +65,10 @@ class Alumni(models.Model):
 
 
 
+class Temporary(models.Model):
+    description = models.CharField(max_length=255, blank=True)
+    document = models.FileField(upload_to='Alumni_videos/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+
+

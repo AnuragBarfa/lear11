@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group, User
 
 from alumni.forms import AlumniProfileForm
 from student.forms import StudentProfileForm
-from alumni.models import Alumni
+from alumni.models import Alumni,Post
 from student.models import Student
 from .forms import UserForm
 
@@ -50,10 +50,9 @@ def register(request):
         user.set_password(password)
         user.save()
         user = authenticate(username=username, password=password)
-        #print(group)
         my_group = Group.objects.get(name=group)
         my_group.user_set.add(user)
-        if group=="Alumni":
+        if str(group)=="Alumni":
             new_Alumni=Alumni.objects.create(user=user,name=name,roll_no=username,phone_no=phone_no,email_link=email_link,ln_link=ln_link,fb_link=fb_link,curr_work = curr_work,prev_work=pre_work)
             new_Alumni.save()
         else :
@@ -72,6 +71,7 @@ def register(request):
 @login_required
 @permission_required('polls.can_vote')
 def update_user(request):
+    #not working completetly till now
     alumni=Alumni.objects.all()
     student=Student.objects.all()
     cur_year=(timezone.now().year)/100
@@ -93,9 +93,8 @@ def update_user(request):
 @login_required
 def profile(request):
     group=request.user.groups.all()
-    us = request.user
-    no_of_posts_by_user = len(us.post_set.all())
-    print(group)
+    my_posts=Post.objects.all().filter(author=request.user)
+    no_of_posts_by_user = len(my_posts)
     for g in group:
         if g.name=="Student":
             person=Student.objects.filter(user=request.user)
@@ -103,31 +102,24 @@ def profile(request):
             #print("in alumni")
             person = Alumni.objects.filter(user=request.user)
     #print(person)
-    return render(request,'registration/profile.html',{'alumni':person,'no_of_posts_by_user':no_of_posts_by_user})
+    return render(request,'registration/profile.html',{'alumni':person,'no_of_posts_by_user':no_of_posts_by_user,'my_posts':my_posts})
 @login_required
 def profile_edit_manual(request):
-    # # driver = webdriver.Firefox(executable_path=r'your\path\geckodriver.exe')  # I actually used the chromedriver and did not test firefox, but it should work.
-    # # profile_link = "https://www.linkedin.com/in/ashish-ranjan-753429136/"
-    # # driver.get(profile_link)
-    # # html = driver.page_source
-    # # soup = bs.BeautifulSoup(html,'lxml')  # specify parser or it will auto-select for you
-    # # summary = soup.find('section', {"id": "summary"})
-    # # print (summary.getText())
-    #urlopener = urllib3.build_opener()
-    #urlopener.addheaders = [('User-agent', 'Mozilla/5.0')]
-    #sauce = urlopener.open('https://www.linkedin.com/in/deepakgouda/').read()
-    #sauce = urllib3.urlopen('https://www.linkedin.com/in/ashish-ranjan-753429136/').read()
-    #soup=bs.BeautifulSoup(sauce,'lxml')
-    #print(soup)
     group = request.user.groups.all()
     for g in group:
         if g.name=="Student":
             student = get_object_or_404(Student, user=request.user)
+            person=Student.objects.filter(user=request.user)
             if request.method == "POST":
                 #for taking image input write enctype="multipart/form-data" in form in html and request.FILES in form in view
                 form = StudentProfileForm(request.POST,request.FILES, instance=student)
                 if form.is_valid():
                     student = form.save(commit=False)
+                    email = form.cleaned_data["email_link"]
+                    curr_user=request.user
+                    curr_user.email=email
+                    curr_user.save()
+                    print(email)
                     student.save()
                     return redirect('home:profile')
             else:
@@ -135,16 +127,23 @@ def profile_edit_manual(request):
 
         else :
             alumni = get_object_or_404(Alumni, user=request.user)
+            person = Alumni.objects.filter(user=request.user)
             if request.method == "POST":
                 form = AlumniProfileForm(request.POST,request.FILES, instance=alumni)
                 if form.is_valid():
                     alumni = form.save(commit=False)
+                    email = form.cleaned_data["email_link"]
+                    curr_user = request.user
+                    curr_user.email = email
+                    curr_user.save()
+                    print(email)
                     alumni.save()
                     return redirect('home:profile')
             else:
+                #giving this arguments to the form make form pre filled with previous data
                 form = AlumniProfileForm({'name':alumni.name, 'roll_no':alumni.roll_no, 'profile_img':alumni.profile_img, 'passout_year':alumni.passout_year, 'phone_no':alumni.phone_no, 'fb_link':alumni.fb_link, 'ln_link':alumni.ln_link, 'email_link':alumni.email_link, 'curr_work':alumni.curr_work, 'prev_work':alumni.prev_work})
 
-    return render(request, 'registration/edit_profile.html', {'form': form,})
+    return render(request, 'registration/edit_profile.html', {'form': form,'person':person})
 def profile_edit_linkdin(request):
     # # driver = webdriver.Firefox(executable_path=r'your\path\geckodriver.exe')  # I actually used the chromedriver and did not test firefox, but it should work.
     # # profile_link = "https://www.linkedin.com/in/ashish-ranjan-753429136/"

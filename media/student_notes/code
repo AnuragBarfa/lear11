@@ -1,0 +1,36 @@
+#include <iostream>
+#include <bits/stdc++.h>
+long long a[100000];
+int binarySearch(int low,int high,int key)
+{
+   while(low<=high)
+   {
+     int mid=(low+high)/2;
+     if(a[mid]<key)
+     {
+         low=mid+1;
+     }
+     else if(a[mid]>key)
+     {
+         high=mid-1;
+     }
+     else
+     {
+         return mid;
+     }
+   }
+   return -1;                //key not found
+}
+int minimum(int a,int b){
+    if(a<b)return a;
+    else return b;
+}
+using namespace std;
+bool cmp(const string& a, const string& b)
+{
+	return a.size() > b.size();
+}
+int main() {
+	string input[100500]
+	return 0;
+}

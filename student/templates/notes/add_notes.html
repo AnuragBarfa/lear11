@@ -1,0 +1,10 @@
+{% extends "student/baseuser.html" %}
+
+{% block content %}
+<div id="form_container">
+    <form method='POST' class="post-form" action='{{ action_url }}' enctype='multipart/form-data'>{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Add Question</button>
+    </form>
+</div>
+{% endblock %}

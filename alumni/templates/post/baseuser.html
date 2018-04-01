@@ -1,5 +1,6 @@
 {% extends "home/unknownbase.html" %}
 {% load staticfiles %}
+{% load auth_extras %}
 {% block style%}
 <title>Matrix</title>
 <!--
@@ -26,7 +27,10 @@
         {% if user.is_superuser %}
         <a href="{% url 'alumni:post_approval' %}" class = "btn-round" style="text-decoration: none; background-color: #008CBA;"><span style="color: black;"><i class="icon fa-bell-o"></i> &nbsp;View {{approvalpending}} approval(s) pending</span></a>
         {% endif %}
-        <a href="{% url 'alumni:post_new' %}" class = "btn-round" style="text-decoration: none; background-color: #4CAF50;"><span style="color: black;"><i class="icon fa-plus"></i> &nbsp;Add Post</span></a>
+        {% if request.user|has_group:"Alumni" %}
+        <a href="{% url 'alumni:video_upload' %}" class = "btn-round" style="text-decoration: none; background-color: #CC6600;"><span style="color: black;"><i class="icon fa-upload"></i> &nbsp;Upload Video</span></a>
+        {% endif %}
+          <a href="{% url 'alumni:post_new' %}" class = "btn-round" style="text-decoration: none; background-color: #4CAF50;"><span style="color: black;"><i class="icon fa-plus"></i> &nbsp;Add Post</span></a>
         <a href="{% url 'alumni:post_draft_list' %}" class = "btn-round" style="text-decoration: none; background-color: #f44336;"><span style="color: black;"><i class="icon fa-edit"></i> &nbsp;View Drafts</span></a>
         <br><br><br>
      {% endif %}

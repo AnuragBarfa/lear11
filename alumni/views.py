@@ -1,11 +1,13 @@
 from django.shortcuts import render ,get_object_or_404 ,redirect
 from django.template.defaultfilters import length
 from django.utils import timezone
-from .models import Post,Comment,Alumni
+from .models import Post,Comment,Alumni,Temporary
 from student.models import Student
-from .forms import PostForm,CommentForm
+from .forms import PostForm,CommentForm,TemporaryForm
 from django.contrib.auth.decorators import login_required,permission_required
 from django.db.models import Q
+#VEDIO_FILE_TYPES = ['webm','wav', 'mp3', 'ogg']
+
 
 ########### alumni view start
 
@@ -45,6 +47,8 @@ def alumni_detail(request ,pk):
 @login_required
 def post_list(request):
     posts = Post.objects.filter(published_date__isnull=False).order_by('created_date')
+    videos=Temporary.objects.all()
+    videos=videos[::-1]
     posts=posts[::-1]#for reversing the array
     unapprovedposts = Post.objects.filter(approved_post=False).order_by('created_date')
     unpublishedposts = Post.objects.filter(published_date__isnull=True).order_by('created_date')
@@ -57,7 +61,6 @@ def post_list(request):
         if g.name == "Student":
             person = get_object_or_404(Student, user=request.user)
         else:
-            # print("in alumni")
             person = get_object_or_404(Alumni, user=request.user)
     if request.method == "POST":
         form = CommentForm(request.POST)
@@ -77,7 +80,7 @@ def post_list(request):
             return redirect('alumni:post_list')
     else:
         form = CommentForm()
-    return render(request, 'post/post_list.html', {'form':form,'posts': posts,'approvalpending':approvalpending,'person':person})
+    return render(request, 'post/post_list.html', {'form':form,'posts': posts,'videos':videos,'approvalpending':approvalpending,'person':person})
 
 @login_required
 def post_new(request):
@@ -171,7 +174,7 @@ def post_publish(request, pk):
         return render(request, 'post/error.html')
 
 @login_required
-def post_remove(request, pk):
+def post_delete(request, pk):
     post = get_object_or_404(Post, pk=pk)
     users_all_post = Post.objects.filter(author=request.user)
     if (post in users_all_post):
@@ -240,31 +243,29 @@ def post_approval(request):
 def post_approve(request, pk):
     post = get_object_or_404(Post, pk=pk)
     post.approve()
-    posts = Post.objects.filter(published_date__isnull=False).order_by('created_date')
-    unapprovedposts = Post.objects.filter(approved_post=False).order_by('created_date')
-    unpublishedposts = Post.objects.filter(published_date__isnull=True).order_by('created_date')
-    if len(unapprovedposts) - len(unpublishedposts) >= 0:
-        approvalpending = len(unapprovedposts) - len(unpublishedposts)
-    else:
-        approvalpending = 0
-    return render(request, 'post/post_list.html', {'posts': posts,'approvalpending':approvalpending,})
-
-
+    return redirect('alumni:post_approval')
+    # return render(request, 'post/post_list.html', {'posts': posts,'approvalpending':approvalpending,'person':person})
 @login_required
 @permission_required('polls.can_vote')
 def post_remove(request, pk):
     post = get_object_or_404(Post, pk=pk)
     post.delete()
-    posts = Post.objects.filter(published_date__isnull=False).order_by('created_date')
-    unapprovedposts = Post.objects.filter(approved_post=False).order_by('created_date')
-    unpublishedposts = Post.objects.filter(published_date__isnull=True).order_by('created_date')
-    if len(unapprovedposts) - len(unpublishedposts) >= 0:
-        approvalpending = len(unapprovedposts) - len(unpublishedposts)
-    else:
-        approvalpending = 0
-    return render(request, 'post/post_list.html', {'posts': posts,'approvalpending':approvalpending})
+    return redirect('alumni:post_approval')
 
 
 #post view end
+####### upload video veiw
+@login_required
+def video_upload(request):
+    if request.method == 'POST':
+        form = TemporaryForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('alumni:post_list')
+    else:
+        form = TemporaryForm()
+    return render(request, 'post/video_upload.html', {
+        'form': form
+    })
 
 

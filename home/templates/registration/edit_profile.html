@@ -2,13 +2,40 @@
 {% block title %}Register{% endblock %}
 {% block body %}
 {% block register_active %}active{% endblock %}
-    <br><br><br>
-    <form method="POST" class="post-form" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="save btn btn-default">Save</button>
-    </form>
+    <div class="container" style="margin:10px;">
+        <form method="POST" class="post-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="col-md-2">
 
+            </div>
+            <div class="col-md-8" id="form" >
+                <div class="row" style="padding:10px;">
+                    <div class="col-md-4" >
+                        {% for us in person %}
+                            <img src="{{ us.profile_img.url }}" alt="Avatar" style="width:200px; height:200px;">
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        {{form.name}}<br>
+                        {{form.phone_no}}<br>
+                        {{form.email_link}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4" >
+                        {{form.profile_img}}<br>
+                    </div>
+                    <div class="col-md-6" align="center">
+                        {{form.fb_link}}<br>
+                        {{form.ln_link}}<br>
+                        {{form.curr_work}}<br>
+                        {{form.pre_work}}<br>
+                        <button type="submit" class="btn btn-lg btn-round">Save</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
 {% endblock %}
 
 

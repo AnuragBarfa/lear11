@@ -1,0 +1,217 @@
+{% extends "student/baseuser.html" %}
+{% block stylebaseuser %}
+<style>
+   table{
+        position:absolute;
+        background-color:white;
+        z-index:10;
+    }
+    footer{cursor: pointer;}
+</style>
+
+{% endblock %}
+{% block content %}
+    <div class="w3-container">
+        <div class="col-md-12">
+            {% for semester in semester_list %}
+            <div class="w3-card-5 col-md-5" align="center" style="margin:20px;">
+                <header class="w3-container w3-blue">
+                    <a href="{% url 'student:all_subjects_in_semester' semester%} " style="text-decoration:none;"><h3>{{semester}} Notes</h3></a>
+                </header>
+                <footer class="w3-container w3-blue">
+                  <h3>Click here to see Credit</h3>
+                </footer>
+                {% ifequal semester|slice:":1" '1' %}
+                    <table>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>L</th>
+                            <th>T</th>
+                            <th>P</th>
+                            <th>C</th>
+                        </tr>
+                        {% for subject in semesters.0 %}
+                            <tr>
+                                {% for detail in subject%}
+                                    <td>{{detail}}</td>
+                                {%endfor%}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endifequal%}
+                {% ifequal semester|slice:":1" '2' %}
+                    <table>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>L</th>
+                            <th>T</th>
+                            <th>P</th>
+                            <th>C</th>
+                        </tr>
+                        {% for subject in semesters.1 %}
+                            <tr>
+                                {% for detail in subject%}
+                                    <td>{{detail}}</td>
+                                {%endfor%}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endifequal%}
+                {% ifequal semester|slice:":1" '3' %}
+                    <table>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>L</th>
+                            <th>T</th>
+                            <th>P</th>
+                            <th>C</th>
+                        </tr>
+                        {% for subject in semesters.2 %}
+                            <tr>
+                                {% for detail in subject%}
+                                    <td>{{detail}}</td>
+                                {%endfor%}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endifequal%}
+                {% ifequal  semester|slice:":1" '4'%}
+                    <table >
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>L</th>
+                            <th>T</th>
+                            <th>P</th>
+                            <th>C</th>
+                        </tr>
+                        {% for subject in semesters.3 %}
+                            <tr>
+                                {% for detail in subject%}
+                                    <td>{{detail}}</td>
+                                {%endfor%}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endifequal%}
+                {% ifequal semester|slice:":1" '5' %}
+                    <table>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>L</th>
+                            <th>T</th>
+                            <th>P</th>
+                            <th>C</th>
+                        </tr>
+                        {% for subject in semesters.4 %}
+                            <tr>
+                                {% for detail in subject%}
+                                    <td>{{detail}}</td>
+                                {%endfor%}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endifequal%}
+                {% ifequal semester|slice:":1" '6' %}
+                    <table>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>L</th>
+                            <th>T</th>
+                            <th>P</th>
+                            <th>C</th>
+                        </tr>
+                        {% for subject in semesters.5 %}
+                            <tr>
+                                {% for detail in subject%}
+                                    <td>{{detail}}</td>
+                                {%endfor%}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endifequal%}
+                {% ifequal semester|slice:":1" '7' %}
+                    <table>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>L</th>
+                            <th>T</th>
+                            <th>P</th>
+                            <th>C</th>
+                        </tr>
+                        {% for subject in semesters.6 %}
+                            <tr>
+                                {% for detail in subject%}
+                                    <td>{{detail}}</td>
+                                {%endfor%}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endifequal%}
+                {% ifequal semester|slice:":1" '8' %}
+                    <table>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>L</th>
+                            <th>T</th>
+                            <th>P</th>
+                            <th>C</th>
+                        </tr>
+                        {% for subject in semesters.7 %}
+                            <tr>
+                                {% for detail in subject%}
+                                    <td>{{detail}}</td>
+                                {%endfor%}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endifequal%}
+                {% ifequal semester|slice:":1" 'F' %}
+                    <table>
+                        <tr>
+                            <td>Competitive Coding</td>
+                        </tr>
+                        <tr>
+                            <td>Research</td>
+                        </tr>
+                        <tr>
+                            <td>Machine Learning</td>
+                        </tr>
+                        <tr>
+                            <td>Web Developement</td>
+                        </tr>
+                        <tr>
+                            <td>Android Developement</td>
+                        </tr>
+                    </table>
+                {% endifequal%}
+
+            </div>
+            {% endfor %}
+        </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scriptbaseuser %}
+     <script>
+        $('table').hide();
+        $("footer").click(function(){
+            $('table').hide()//for one table to open at one time
+            $(this).parent().find('table').toggle();
+        });
+        //for hidding all visible table when clicked at any other random point on the page
+        $(document).on('click', function (e) {
+            if ($(e.target).closest(".w3-card-5").length === 0) {
+                $("table").hide();
+            }
+        });
+    </script>
+{% endblock %}
+

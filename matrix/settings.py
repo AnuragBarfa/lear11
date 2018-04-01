@@ -35,16 +35,17 @@ ALLOWED_HOSTS = ['*',]
 # Application definition
 
 INSTALLED_APPS = [
+    #add the app in the starting of this list to overide django.contrib.auth
+    'home',
+    'alumni',
+    'student',
+    'dimension',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'home',
-    'alumni',
-    'student',
-    'dimension',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

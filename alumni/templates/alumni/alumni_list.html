@@ -1,14 +1,48 @@
 {% extends 'alumni/baseuser.html' %}
+{% block stylebaseuser %}
+    <style>
+            table.dataTable thead .sorting:before, table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:before, table.dataTable thead .sorting_asc:after, table.dataTable thead .sorting_desc:before, table.dataTable thead .sorting_desc:after {
+               padding: 5px;
+            }
+            .dataTables_wrapper .mdb-select {
+                border: none;
+            }
+            .dataTables_wrapper .mdb-select.form-control {
+                padding-top: 0;
+                margin-top: -1rem;
+                margin-left: 0.7rem;
+                margin-right: 0.7rem;
+                width: 100px;
+            }
+            .dataTables_length label {
+                display: flex;
+                justify-content: left;
+            }
+            .dataTables_filter label {
+                margin-bottom: 0;
+            }
+            .dataTables_filter label input.form-control {
+                margin-top: -0.6rem;
+                padding-bottom: 0;
+            }
+            table.dataTable {
+                margin-bottom: 3rem!important;
+            }
+            div.dataTables_wrapper div.dataTables_info {
+                padding-top: 0;
+            }
+        </style>
 
+{% endblock %}
 {% block content %}
-    <div class="search_box "style="width:200px;margin:auto;">
+    <div class="search_box row"style="width:200px;margin:auto;">
         <form class="navbar-form navbar-left" role="search" method="get" action="{% url 'alumni:alumni_list' %}">
             <div class="form-group">
                 <input type="text" class="form-control" placeholder="Search" name="q" value="{{ request.GET.q }}">
             </div>
             <!--<button type="submit" class="btn btn-default">Search</button>-->
         </form>
-     </div>
+    </div>
     <div class="container">
         <div class="row">
             <div class="col-md-8">
@@ -35,7 +69,7 @@
                                 <td><a href="{% url 'alumni:alumni_detail' pk=alumni.pk %}" style="text-decoration:none;color:black;">{{alumni.name}}</a></td>
                                 <td>{{alumni.passout_year}}</td>
                                 <td>{{alumni.email_link}}</td>
-                                <td>{{alumni.ln_link}}</td>
+                                <td><a href="{{alumni.ln_link}}" target="blank">{{alumni.ln_link}}</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -44,12 +78,14 @@
             <div class="col-md-1">
 
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3" style="max-height:1000px;overflow-y: scroll;padding:10px">
                 <a href="{% url 'alumni:post_list' %}" style="text-decoration:none;text-align:center;"><h2>AlumBook</h2></a>
                 {% for post in posts %}
-                    <h4 style = "margin-bottom: 8px;" ><a href="{% url 'alumni:post_detail' pk=post.pk %}">{{ post.title }}</a></h4>
-                    {{post.text|slice:":30"}}....
-                    <br>
+                    <div class="w3-panel w3-pale-blue w3-leftbar  w3-border-blue">
+                        <h4 style = "margin-bottom: 8px;" ><a href="{% url 'alumni:post_detail' pk=post.pk %}">{{ post.title }}</a></h4>
+                        {{post.text|slice:":30"}}....
+                    </div>
+
                 {% endfor %}
             </div>
         </div>

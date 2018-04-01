@@ -20,10 +20,13 @@ from django.urls import path
 #from django.contrib.auth import views as auth_views
 
 from . import settings
+#always include the apps at the first in the list of Installed App so that it can override default auth templates
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('home.urls', namespace='home')),
     url(r'^alumni/', include('alumni.urls',namespace='alumni')),
+    url(r'^student/', include('student.urls',namespace='student')),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
     url(r'^accounts/', include('django.contrib.auth.urls')),
     url(r'^dimension/', include('dimension.urls',namespace='dimension')),
 

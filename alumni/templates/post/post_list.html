@@ -1,6 +1,21 @@
 {% extends 'post/baseuser.html' %}
 
 {% block content %}
+    {% for video in videos %}
+        <div class="w3-card-8 post" align="center" style="padding:25px;width:1100px;" >
+            <!--<div class="row text-center" style="text-align:center;">{{video.description}}</div>-->
+            <div>
+                <h3><strong>{{video.description}}</strong></h3>
+            </div>
+            <div>
+                <video width="700" controls>
+                      <source src="{{ video.document.url }}" type="video/mp4">
+                      <source src="{{ video.document.url }}" type="video/ogg">
+                      Your browser does not support HTML5 video.
+                </video>
+            </div>
+        </div><br><br>
+    {% endfor %}
     {% for post in posts %}
         {% if post.approved_post %}
             <div class="w3-card-8 post" style="padding:25px;width:1100px;" >
@@ -36,6 +51,7 @@
                             </div>
                         </div>
                     </form>
+
                 </div>
                 <!--comments-->
                 <div class="try container">
@@ -55,6 +71,7 @@
                         <p>No comments here yet :(</p>
                     {% endfor %}
                 </div>
+
                 <div class="read_more_less2 container" >
                     {% for comment in post.comments.all|slice:"3:"%}
                         {% if user.is_authenticated or comment.approved_comment %}

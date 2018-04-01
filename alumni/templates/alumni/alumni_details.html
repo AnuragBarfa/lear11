@@ -1,6 +1,31 @@
 {% extends 'alumni/baseuser.html' %}
 
 {% block content %}
-{{alumni}}
-<img src="{{ alumni.profile_img.url }}"  alt="imagewas" width="150px" height="150px"  />
+<br><br><br><br>
+    <div class="container">
+        <div class="col-md-4">
+
+        </div>
+        <div class="col-md-4 w3-dark-grey w3-card-8" align="center" style="border:solid;padding:15px;">
+            <div class="photo-container">
+                <img width="200px" height="200px" class="mx-auto rounded-circle img-raised" src="{{ alumni.profile_img.url }}" alt="Profile Image">
+            </div>
+            <br>
+            <h3 class="title" style="color:white;">{{ alumni.name }}</h3>
+            <p class="category" style="color:white;">{{ alumni.curr_work }}</p>
+
+            <div class="social-line">
+                <a href="{{ alumni.fb_link }}" style = "color: #3b5998;" class="btn btn-neutral btn-icon btn-round" target="blank">
+                    <i class="fa fa-facebook-square"></i>
+                </a>
+                <a href="{{ alumni.ln_link }}" style = "color: #3b5998;" class="btn btn-neutral btn-icon btn-lg btn-round" target="blank">
+                    <i class="fa fa-linkedin"></i>
+                </a>
+                <a href="https://mail.google.com/mail/u/0/?view=cm&fs=1&to={{alumni.email_link}}" style = "color: red;" class="btn btn-neutral btn-icon btn-round" target="blank">
+                    <i class="fa fa-envelope"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+<br><br>
 {% endblock %}

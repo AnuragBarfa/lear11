@@ -1,0 +1,123 @@
+{% extends "student/baseuser.html" %}
+{% block stylebaseuser %}
+    <style>
+        a{text-decoration:none;}
+        h3{ cursor: pointer; }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h3 align="center"><strong>PreMidsem Notes <i class="icon now-ui-icons fa-caret-down"></i></strong></h3>
+                <div class="data">
+                    {% for data in notes.0%}
+                        <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+                            <a href="{{data.document.url}}">{{data.document|slice:":4"}}</a>
+                        </div>
+                    {% empty %}
+                        <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+                            <p>No Data for this yet :(</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h3 align="center"><strong>Quiz 1 Papers <i class="icon now-ui-icons fa-caret-down"></i></strong></h3>
+                <div class="data">
+                    {% for data in papers.0%}
+                        <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+                            <a href="{{data.document.url}}">{{data.document}}</a>
+                        </div>
+                    {% empty %}
+                        <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+                            <p>No Data for this yet :(</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h3 align="center"><strong>Midsem Papers <i class="icon now-ui-icons fa-caret-down"></i></strong></h3>
+                <div class="data">
+                    {% for data in papers.1%}
+                        <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+                            <a href="{{data.document.url}}">{{data.document}}</a>
+                        </div>
+                    {% empty %}
+                        <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+                            <p>No Data for this yet :(</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <h3 align="center"><strong>PostMidsem Notes <i class="icon now-ui-icons fa-caret-down"></i></strong></h3>
+                <div class="data">
+                    {% for data in notes.1%}
+                        <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+                            <a href="{{data.document.url}}">{{data.document|slice:"4:"}}</a>
+                        </div>
+                    {% empty %}
+                        <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+                            <p>No Data for this yet :(</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h3 align="center"><strong>Quiz 2 Papers <i class="icon now-ui-icons fa-caret-down"></i></strong></h3>
+                 <div class="data">
+                    {% for data in papers.2%}
+                        <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+                            <a href="{{data.document.url}}">{{data.document}}</a>
+                        </div>
+                     {% empty %}
+                        <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+                            <p>No Data for this yet :(</p>
+                        </div>
+                    {% endfor %}
+                 </div>
+            </div>
+            <div class="col-md-4">
+                <h3 align="center"><strong>Endsem Papers <i class="icon now-ui-icons fa-caret-down"></i></strong></h3>
+                 <div class="data">
+                    {% for data in papers.3%}
+                        <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+                            <a href="{{data.document.url}}">{{data.document}}</a>
+                        </div>
+                     {% empty %}
+                        <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+                            <p>No Data for this yet :(</p>
+                        </div>
+                    {% endfor %}
+                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <h3 align="center"><strong>Other Notes <i class="icon now-ui-icons fa-caret-down"></i></strong></h3>
+                <div class="data">
+                    {% for data in notes.2%}
+                        <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+                            <a href="{{data.document.url}}">{{data.document}}</a>
+                        </div>
+                    {% empty %}
+                        <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow">
+                            <p>No Data for this yet :(</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scriptbaseuser %}
+    <script>
+        $('.data').hide();
+        $("h3").click(function(){
+            $(this).parent().find('.data').toggle();
+        });
+    </script>
+{% endblock %}
