@@ -22,10 +22,10 @@
                 <!--header-->
                 <div>
                     <div style="display:inline-block;vertical-align: middle;margin:5px;">
-                        <img src="{{ post.author_image.url }}"  style="height:60px;width:60px;border-radius: 50%;"/>
+                        <img src="{{ post.author.person_img.url }}"  style="height:60px;width:60px;border-radius: 50%;"/>
                     </div>
                     <div style="display:inline-block;vertical-align: middle;">
-                        {{post.author.first_name}} {{post.author.last_name}} <br>
+                        <strong>{{post.author.username}} </strong> <br>
                         {{ post.published_date }}
                     </div>
                 </div>
@@ -39,29 +39,40 @@
                     <a href="{% url 'alumni:post_detail' pk=post.pk %}">Comments: {{ post.approved_comments.count }}</a>
                     <form method="POST" class="post-form">
                         {% csrf_token %}
+                        <!--{{form.as_p}}-->
                         <div>
                             <div style="display:inline-block;vertical-align: middle;margin:5px;">
-                                <img src="{{ person.profile_img.url }}"  style="height:50px;width:50px;border-radius: 50%;"/>
+                                <img src="{{ person.person.person_img.url }}"  style="height:50px;width:50px;border-radius: 50%;"/>
                             </div>
-                            <div  style="width:70%;display:inline-block;vertical-align: middle;">
-                                <input style="border-radius: 50px;"type="text" name="text" value="" placeholder="Write a comment..." class="form-control" />
+                            <div class="my-form-textarea" style="background-color:white;border-radius: 50px;padding-left: 25px;padding-right:25px;border:solid;border-width:1px;width:70%;display:inline-block;vertical-align: middle;position:relative;">
+                                <!--<input style="font-size:16pt;border-radius: 50px;font-size:120%;"size="15" type="text" name="text" value="" placeholder="Write a comment..." class="form-control" />-->
+                                <textarea style="font-size:13pt;border:none;" rows="1" cols="50" name="text" placeholder="Write a comment..." class="form-control"></textarea>
                             </div>
-                            <div  style="display:inline-block;vertical-align: middle;margin:5px;">
-                                <button type = "submit" name="butt" value = "{{post.pk}}" class="btn btn-round ">Send</a></button>
+                            <div  style="display:inline-block;vertical-align: middle;margin:5px;padding-top:20px;">
+                                {% include 'post/emojis.html' %}
                             </div>
+
+                            <div  style="display:inline-block;vertical-align: middle;margin:5px;position:relative;">
+                                <button type = "submit" name="butt" value = "{{post.pk}}" class="btn btn-round " ; return false;">Comment</button>
+                            </div>
+
                         </div>
                     </form>
 
                 </div>
                 <!--comments-->
-                <div class="try container">
-                    {% for comment in post.comments.all|slice:":3" %}
+                <div class="curr_comment">
+
+                </div>
+                <div class="try">
+                    <!--for sorting comments of posts based on key created_date used dictsort and for reverseing it use reversed-->
+                    {% for comment in post.comments.all|dictsortreversed:"created_date"|slice:":3" %}
                         {% if user.is_authenticated or comment.approved_comment %}
-                        <div class="comment">
+                        <div class="comment  container" style="">
                             <div class="col-md-1">
-                                <img src="{{ comment.author_image.url }}"  style="height:50px;width:50px;border-radius: 50%;"/>
+                                <img src="{{ comment.author.person_img.url }}"  style="height:50px;width:50px;border-radius: 50%;"/>
                             </div>
-                            <div class="col-md-11">
+                            <div class="col-md-11"style="font-size:11pt;border-width:5;">
                                 <strong>{{ comment.author }} | </strong>{{ comment.created_date }}
                                 {{ comment.text|linebreaks }}
                             </div>
@@ -72,15 +83,15 @@
                     {% endfor %}
                 </div>
 
-                <div class="read_more_less2 container" >
-                    {% for comment in post.comments.all|slice:"3:"%}
+                <div class="read_more_less2 " >
+                    {% for comment in post.comments.all|dictsortreversed:"created_date"|slice:"3:" %}
                         {% if user.is_authenticated or comment.approved_comment %}
-                        <div class="comment">
+                        <div class="comment container">
                             <div class="col-md-1">
-                                <img src="{{ comment.author_image.url }}"  style="height:50px;width:50px;border-radius: 50%;"/>
+                                <img src="{{ comment.author.person_img.url }}"  style="height:50px;width:50px;border-radius: 50%;"/>
                             </div>
                             <div class="col-md-11">
-                                <strong>{{ comment.author }}  </strong>{{ comment.created_date }}
+                                <strong>{{ comment.author }} | </strong>{{ comment.created_date }}
                                 {{ comment.text|linebreaks }}
                             </div>
                         </div>
@@ -88,8 +99,12 @@
                     {% endfor %}
                 </div>
                 {% if post.comments.all|slice:"3:" %}
-                    <input type="button" class="hide1" value="View all comments" >
+                    <p style="color:#f44242;display:inline-block;" class="hide1">View all comments <i class="fa fa-angle-double-down"></i></p>
+                <!--<input type="button"  class="hide1" value="View all comments" style="background:none;border:0px;">-->
+                <!--<button class="hide1" value="View all comments" style="background:none;border:0px;outline:none;">View all comments</button>-->
+                    <!--<p class="show1">Show more</p>-->
                 {% endif %}
+
                 <!--<button class="hide1">Read More</button>-->
 
                 <!--<button class="show1">Show</button>-->
@@ -99,5 +114,135 @@
     {% endfor %}
 {% endblock content %}
 {% block scriptbase %}
+
+    <!--Script for read more read less on post_list page for comments-->
+    <script>
+    $(document).ready(function(){
+        $('.read_more_less2').toggle();
+        $(".hide1").click(function(){
+            if($(this).text()=="View less comments "){
+                $(this).text("View all comments ");
+                $(this).append('<i class="fa fa-angle-double-down"></i>' );//use '' for tags and "" for text
+                }
+            else {
+                $(this).text("View less comments ");
+                $(this).append( '<i class="fa fa-angle-double-up"></i>' );
+                }
+            $(this).parent().find('.read_more_less2').toggle();
+
+        });
+        $(".show1").click(function(){
+            $(this).parent().find('.read_more_less2').toggle();
+        });
+
+    });
+    </script>
+<!--script to handle the form submit without refresh-->
+    <script>
+        $('form').on('submit', function(event){
+            event.preventDefault();//to stop reload
+            //console.log("form submitted!");  // sanity check
+            //console.log("create post is working!"); // sanity check
+            var comment_text=$(this).find($('.form-control')).val();//current containt of comment form
+            var curr_form=$(this);
+            $(this).find($('.form-control')).val('');//setting comment form containt to empty
+            $.ajax({
+                url : "", // the endpoint
+                type : "POST", // http method
+                data : { csrfmiddlewaretoken: '{{ csrf_token }}',the_post : comment_text,pk_id:$(this).find($("button")).val() }, // data sent with the post request
+                // handle a successful response
+                success : function(json) {
+                    //this is the comment added to other comments using jquery
+                    var codeBlock = '<div class="comment container" >' +
+                                        '<div class="col-md-1">'+
+                                            '<img src='+json["author_image"] +' style="height:50px;width:50px;boder:solid;border-radius: 50%;"/>'+
+                                        '</div>'+
+                                        '<div class="col-md-11" style="font-size:11pt;border-width:5;">'+
+                                            '<strong>'+json["author"]+' |</strong>'+json["date"]+'<br>'+
+                                            json["text"]+
+                                        '</div>'+
+                                    '</div>'+
+                                    '<br>';//this br is to handle the extra line that loaded comments has got because of linebreak used to represent the comment text
+                    //class container is added to codeBlock because the container class of class curr_comment was not giving the css of container to it's childrens appended using jquery
+                    //curr_form.find("#result").append(comment_text);
+                    if(!(json["author"]==undefined ||json["text"]==undefined||json["date"]==undefined)){
+                        //to check if empty form is not submitted
+                        curr_form.parent().parent().find(".curr_comment").prepend(codeBlock);
+                    }
+
+                    console.log(json); // log the returned json to the console
+                    //console.log("success"); // another sanity check
+                },
+
+                // handle a non-successful response
+                error : function(xhr,errmsg,err) {
+                    $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                        " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                }
+            });
+        });
+    </script>
+<!--script to handale emoji's-->
+    <script>
+        //to add emoji in comment box
+        $(".emoji").click(function(){
+            //alert("anur");
+            var text_field=$(this).parent().parent().parent().parent().parent().parent().find(".form-control");
+            var cursor_pos_start=text_field[0].selectionStart;
+            var cursor_pos_end=text_field[0].selectionEnd;//to get the position of selected region in textarea
+            var len=text_field.val().length;
+            text_field.val(text_field.val().substring(0,cursor_pos_start)+$(this).text()+text_field.val().substring(cursor_pos_end,len));
+            //alert(cursor_pos_start);
+            text_field[0].setSelectionRange(cursor_pos_start+2,cursor_pos_start+2);//to set the position of cursor at the end of inserted emoji
+        });
+        //to stop the dropdown toggle while click inside the dropdown
+        $(document).on('click.bs.dropdown.data-api', '.dropdown.keep-inside-clicks-open', function (e) {
+              e.stopPropagation();
+        });
+    </script>
+    <!--script to handle emoji scroll on selection from bottom-->
+    <script>
+        $(".tosmiley").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".smiley").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+        $(".toanimal").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".animal").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+        $(".tofood").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".food").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+        $(".togame").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".game").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+        $(".toplace").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".place").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+        $(".toobject").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".object").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+        $(".tosymbol").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".symbol").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+        $(".toflag").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".flag").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+    </script>
 
 {% endblock %}

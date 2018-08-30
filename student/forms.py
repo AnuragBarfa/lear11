@@ -9,11 +9,13 @@ class StudentProfileForm(forms.ModelForm):
     fb_link = forms.URLField(required=True)
     ln_link = forms.URLField(required=True)
     phone_no = forms.CharField(required=True)
+    profile_img = forms.ImageField(required=True)
     curr_work = forms.CharField(max_length=100, required=True)
     pre_work = forms.CharField(max_length=200, required=True)
     class Meta:
         model=Student
-        fields=('name','profile_img','phone_no','fb_link','ln_link','email_link','curr_work','prev_work',)
+        #fields=('name','email_link','curr_work','prev_work',)
+        fields = ('name','profile_img', 'phone_no', 'fb_link', 'ln_link', 'email_link', 'curr_work', 'prev_work',)
 
 class NotesForm(forms.ModelForm):
     # Subject_choices1 = [('', '-------'), ('Bio1', 'Bio1'), ('Cse1', 'Cse1'), ('Math1', 'Math1'), ('Me1', 'Me1')]
@@ -26,4 +28,4 @@ class NotesForm(forms.ModelForm):
     # like = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect())
     class Meta:
         model = Note
-        fields = ('description','semester','subject','type','document' )
+        fields = ('semester','subject','type','description','document' )

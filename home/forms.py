@@ -4,10 +4,11 @@ from alumni.models import Alumni
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     group=forms.ModelChoiceField(queryset=Group.objects.all(),required=True)
-    #name = forms.CharField(max_length=30, required=True)
+    username = forms.CharField(max_length=30, required=True)
     first_name = forms.CharField(max_length=30, required=True)#inbuilt user field
     last_name = forms.CharField(max_length=30, required=True)#inbuilt user field
     email=forms.EmailField(required=True)#inbuilt user field
+    image=forms.ImageField()
     fb_link = forms.URLField(required=True)
     ln_link = forms.URLField(required=True)
     phone_no=forms.CharField(required=True)
@@ -15,10 +16,11 @@ class UserForm(forms.ModelForm):
     pre_work = forms.CharField(max_length=200, required=True)
     class Meta:
         model = User
-        fields = ['username','first_name','last_name','phone_no','email','fb_link','ln_link','curr_work','pre_work','password','group',]
+        fields = ['first_name','last_name','phone_no','email','fb_link','ln_link','curr_work','pre_work','username','password','group',]
 
     def save(self, commit=True):
         user = super(UserForm, self).save(commit=False)
+        user.username=self.cleaned_data["username"]
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
         user.email = self.cleaned_data["email"]

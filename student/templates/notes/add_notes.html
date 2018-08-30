@@ -1,10 +1,53 @@
 {% extends "student/baseuser.html" %}
 
-{% block content %}
-<div id="form_container">
-    <form method='POST' class="post-form" action='{{ action_url }}' enctype='multipart/form-data'>{% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="save btn btn-default">Add Question</button>
-    </form>
-</div>
+{% block stylebaseuser %}
+    <style>
+        {
+            max-height: 20px;
+            overflow-y: auto;
+        }
+    </style>
 {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div align="center">
+            <h2>Fill the Info for the Notes to be uploaded</h2>
+        </div>
+        <div class="col-md-2">
+
+        </div>
+        <div class="col-md-6">
+            <div id="form_container">
+                <form method='POST' class="post-form" action='{{ action_url }}' enctype='multipart/form-data'>{% csrf_token %}
+                    {{ form.as_p}}
+                    <p style="color:red">**Supported file types '.pdf', '.doc', '.docx', '.jpg', '.png', '.xlsx', '.xls','.odt','.jpeg','.py','.cpp','.c','.r','.m'</p>
+                    <div align="center">
+                         <button type="submit" class="btn btn-round">Add Question</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+                    <!--<a href="{% url 'student:all_notes_in_subject' Semester_name subject %} " style="text-decoration:none;"><h3>{{subject}}</h3></a>-->
+
+<!--<div class="w3-container">-->
+         <!--<div class="col-md" >-->
+            <!--{% for subject in subject_detail %}-->
+            <!--<div class="w3-card-4 post col-md-3" align="center" style="margin:20px;">-->
+                <!--<header class="w3-container w3-blue">-->
+                    <!--<a href="#" style="text-decoration:none;"><h3>{{subject.0}}</h3></a>-->
+                <!--</header>-->
+                <!--<div class="w3-container"style="margin:10px;min-height:230px">-->
+                    <!--<p>Course Name : {{subject.1}}</p>-->
+                    <!--<p>Professor Name : {{subject.2}}</p>-->
+                    <!--<p>Room No : {{subject.3}}</p>-->
+                <!--</div>-->
+                <!--<footer class="w3-container w3-blue">-->
+                  <!--<h3>Credit : {{subject.4}}</h3>-->
+                <!--</footer>-->
+            <!--</div>-->
+            <!--{% endfor %}-->
+        <!--</div>-->
+    <!--</div>-->

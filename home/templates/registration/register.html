@@ -2,6 +2,7 @@
 {% block title %}Register{% endblock %}
 {% block body %}
 {% block register_active %}active{% endblock %}
+<br><br><br>
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-4">
@@ -12,13 +13,21 @@
                         <p><strong>{{ error_message }}</strong></p>
                     {% endif %}
 				<h2>Profile details</h2>
-				<form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+				<form name="register" class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
 					{% csrf_token %}
-					{% include 'home/form_template.html' %}
+					{% for field in form %}
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <span class="text-danger small">{{ field.errors }}</span>
+                            </div>
+                            <label class="control-label col-sm-2" for="title">{{ field.label_tag }}</label>
+                            <div class="col-sm-10">{{ field }}</div>
+                        </div>
+                    {% endfor %}
                     Already have an account? <a href="{% url 'login'%}?next={{request.path}}">Click here</a> to log in.
 					<div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
-                            <button type="submit" class="btn btn-success">Submit</button>
+                            <button type="submit" class="btn btn-round"style="background-color: #4CAF50;">Submit</button>
                         </div>
                     </div>
 				</form>

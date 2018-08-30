@@ -12,14 +12,17 @@
 {% endblock %}
 {% block content %}
     <div class="w3-container">
+        <div style="margin-left:50px;margin-top:20px;display:inline-block;">
+            <a href="https://www.iitg.ac.in/ramesh_h/tt_next_sem/" style="text-decoration:none;" target="blank"><h2>Class Time Table</h2></a>
+        </div>
         <div class="col-md-12">
             {% for semester in semester_list %}
-            <div class="w3-card-5 col-md-5" align="center" style="margin:20px;">
+            <div class="w3-card-5 col-md-5" align="center" style="margin:20px;display:inline-block;">
                 <header class="w3-container w3-blue">
-                    <a href="{% url 'student:all_subjects_in_semester' semester%} " style="text-decoration:none;"><h3>{{semester}} Notes</h3></a>
+                    <a href="{% url 'student:all_subjects_in_semester' semester%} " style="text-decoration:none;"><h3>Notes {{semester}}</h3></a>
                 </header>
                 <footer class="w3-container w3-blue">
-                  <h3>Click here to see Credit</h3>
+                  <h3>Click here to see Credit distribution</h3>
                 </footer>
                 {% ifequal semester|slice:":1" '1' %}
                     <table>

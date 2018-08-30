@@ -9,6 +9,7 @@ from alumni.forms import AlumniProfileForm
 from student.forms import StudentProfileForm
 from alumni.models import Alumni,Post
 from student.models import Student
+from home.models import Person
 from .forms import UserForm
 
 from lxml import html
@@ -31,8 +32,9 @@ def events(request):
 
 ########### views for user accounts
 def register(request):
-    form = UserForm(request.POST or None)
+    form = UserForm(request.POST , request.FILES)
     if form.is_valid():
+        print("valid")
         user = form.save(commit=False)
         username = form.cleaned_data['username']
         email=form.cleaned_data["email"]
@@ -43,6 +45,7 @@ def register(request):
         phone_no=form.cleaned_data["phone_no"]
         email_link=form.cleaned_data["email"]
         ln_link = form.cleaned_data["ln_link"]
+        image=form.cleaned_data["image"]
         fb_link = form.cleaned_data["fb_link"]
         curr_work = form.cleaned_data["curr_work"]
         pre_work = form.cleaned_data["pre_work"]
@@ -52,11 +55,14 @@ def register(request):
         user = authenticate(username=username, password=password)
         my_group = Group.objects.get(name=group)
         my_group.user_set.add(user)
+
+        new_Person=Person.objects.create(person_user=user,username=username,roll_no=username,person_phone_no=phone_no,person_img=image,person_email_link=email_link,person_fb_link=fb_link,person_ln_link=ln_link)
+        new_Person.save()
         if str(group)=="Alumni":
-            new_Alumni=Alumni.objects.create(user=user,name=name,roll_no=username,phone_no=phone_no,email_link=email_link,ln_link=ln_link,fb_link=fb_link,curr_work = curr_work,prev_work=pre_work)
+            new_Alumni=Alumni.objects.create(person=new_Person,name=name,curr_work = curr_work,prev_work=pre_work)
             new_Alumni.save()
         else :
-            new_Student = Student.objects.create(user=user, name=name, roll_no=username, phone_no=phone_no,email_link=email, ln_link=ln_link, fb_link=fb_link, curr_work=curr_work,prev_work=pre_work)
+            new_Student = Student.objects.create(person=new_Person, name=name,curr_work=curr_work,prev_work=pre_work)
             new_Student.save()
 
         if user is not None:
@@ -66,6 +72,7 @@ def register(request):
     context = {
         "form": form,
     }
+    print("notValid")
     return render(request, 'registration/register.html', context)
 
 @login_required
@@ -93,14 +100,14 @@ def update_user(request):
 @login_required
 def profile(request):
     group=request.user.groups.all()
-    my_posts=Post.objects.all().filter(author=request.user)
+    my_posts=Post.objects.all().filter(author=get_object_or_404(Person,person_user=request.user))
     no_of_posts_by_user = len(my_posts)
     for g in group:
         if g.name=="Student":
-            person=Student.objects.filter(user=request.user)
+            person=Student.objects.filter(person=get_object_or_404(Person,person_user=request.user))
         else :
             #print("in alumni")
-            person = Alumni.objects.filter(user=request.user)
+            person = Alumni.objects.filter(person=get_object_or_404(Person,person_user=request.user))
     #print(person)
     return render(request,'registration/profile.html',{'alumni':person,'no_of_posts_by_user':no_of_posts_by_user,'my_posts':my_posts})
 @login_required
@@ -108,40 +115,82 @@ def profile_edit_manual(request):
     group = request.user.groups.all()
     for g in group:
         if g.name=="Student":
-            student = get_object_or_404(Student, user=request.user)
-            person=Student.objects.filter(user=request.user)
+            student = get_object_or_404(Student, person=get_object_or_404(Person,person_user=request.user))
+            person=Student.objects.filter(person=get_object_or_404(Person,person_user=request.user))
             if request.method == "POST":
                 #for taking image input write enctype="multipart/form-data" in form in html and request.FILES in form in view
                 form = StudentProfileForm(request.POST,request.FILES, instance=student)
                 if form.is_valid():
                     student = form.save(commit=False)
+                    name= form.cleaned_data["name"]
                     email = form.cleaned_data["email_link"]
+                    phone_no= form.cleaned_data["phone_no"]
+                    fb_link= form.cleaned_data["fb_link"]
+                    ln_link= form.cleaned_data["ln_link"]
+                    profile_img=form.cleaned_data["profile_img"]
+                    email_link= form.cleaned_data["email_link"]
+                    curr_work= form.cleaned_data["curr_work"]
+                    pre_work= form.cleaned_data["pre_work"]
                     curr_user=request.user
                     curr_user.email=email
                     curr_user.save()
-                    print(email)
+
+                    curr_person=get_object_or_404(Person,person_user=request.user)
+                    curr_person.person_email_link=email_link
+                    curr_person.person_phone_no =phone_no
+                    curr_person.person_img =profile_img
+                    curr_person.person_fb_link = fb_link
+                    curr_person.person_ln_link = ln_link
+                    curr_person.save()
+
                     student.save()
                     return redirect('home:profile')
             else:
-                form = StudentProfileForm({'name':student.name,'roll_no':student.roll_no,'profile_img':student.profile_img,'passout_year':student.passout_year,'phone_no':student.phone_no,'fb_link':student.fb_link,'ln_link':student.ln_link,'email_link':student.email_link,'curr_work':student.curr_work,'prev_work':student.prev_work})
+                form = StudentProfileForm({'name': student.name, 'profile_img': student.person.person_img,
+                                           'phone_no': student.person.person_phone_no,
+                                           'fb_link': student.person.person_fb_link,
+                                           'ln_link': student.person.person_ln_link,
+                                           'email_link': student.person.person_email_link,
+                                           'curr_work': student.curr_work, 'prev_work': student.prev_work})
 
         else :
-            alumni = get_object_or_404(Alumni, user=request.user)
-            person = Alumni.objects.filter(user=request.user)
+            alumni = get_object_or_404(Alumni, person=get_object_or_404(Person,person_user=request.user))
+            person = Alumni.objects.filter(person=get_object_or_404(Person,person_user=request.user))
             if request.method == "POST":
                 form = AlumniProfileForm(request.POST,request.FILES, instance=alumni)
                 if form.is_valid():
                     alumni = form.save(commit=False)
+                    name = form.cleaned_data["name"]
                     email = form.cleaned_data["email_link"]
+                    phone_no = form.cleaned_data["phone_no"]
+                    fb_link = form.cleaned_data["fb_link"]
+                    ln_link = form.cleaned_data["ln_link"]
+                    profile_img = form.cleaned_data["profile_img"]
+                    email_link = form.cleaned_data["email_link"]
+                    curr_work = form.cleaned_data["curr_work"]
+                    pre_work = form.cleaned_data["pre_work"]
                     curr_user = request.user
                     curr_user.email = email
                     curr_user.save()
-                    print(email)
+
+                    curr_person = get_object_or_404(Person, person_user=request.user)
+                    curr_person.person_email_link = email_link
+                    curr_person.person_phone_no = phone_no
+                    curr_person.person_img = profile_img
+                    curr_person.person_fb_link = fb_link
+                    curr_person.person_ln_link = ln_link
+                    curr_person.save()
+
                     alumni.save()
                     return redirect('home:profile')
             else:
                 #giving this arguments to the form make form pre filled with previous data
-                form = AlumniProfileForm({'name':alumni.name, 'roll_no':alumni.roll_no, 'profile_img':alumni.profile_img, 'passout_year':alumni.passout_year, 'phone_no':alumni.phone_no, 'fb_link':alumni.fb_link, 'ln_link':alumni.ln_link, 'email_link':alumni.email_link, 'curr_work':alumni.curr_work, 'prev_work':alumni.prev_work})
+                form = AlumniProfileForm({'name': alumni.name, 'profile_img': alumni.person.person_img,
+                                           'phone_no': alumni.person.person_phone_no,
+                                           'fb_link': alumni.person.person_fb_link,
+                                           'ln_link': alumni.person.person_ln_link,
+                                           'email_link': alumni.person.person_email_link,
+                                           'curr_work': alumni.curr_work, 'prev_work': alumni.prev_work})
 
     return render(request, 'registration/edit_profile.html', {'form': form,'person':person})
 def profile_edit_linkdin(request):

@@ -2,8 +2,84 @@
 
 {% block content %}
     <h1>New post</h1>
-    <form method="POST" class="post-form">{% csrf_token %}
-        {{ form.as_p }}
-        <button type = "submit" class = "btn btn-lg btn-round" style="text-decoration: none; background-color: #4CAF50;"><span style="color: black;"><i class="icon fa-paper-plane"></i> &nbsp;Post</span></button>
+    <form method="POST" class="post-form" style="width:120%;position:relative;">{% csrf_token %}
+        <!--{{ form.as_p }}-->
+        <input style="font-size:16pt;width:95%;"  type="text" name="title" value="{{form.title.value}}" />
+        <div style="positon:relative;display:inline-block;vertical-align:middle;margin:0px;">
+            <textarea style="font-size:13pt;margin-top:30px;" rows="10" cols="55" name="text" placeholder="Write a comment..."class="my-text-area">{{form.text.value}}</textarea>
+        </div>
+        <div style="position:absolute;display:inline-block;top:45px;">
+            <div style="position:relative;vertical-align:middle;display:inline-block;">
+                {% include 'post/emojis.html' %}
+            </div>
+            <div style="position:relative;display:inline-block;top:-10px;">
+                <button type = "submit" class = "btn btn-lg btn-round" style="text-decoration: none; background-color: #4CAF50;"><span style="color: black;"><i class="icon fa-paper-plane"></i> &nbsp;Post</span></button>
+            </div>
+        </div>
     </form>
+{% endblock %}
+{% block scriptbase %}
+    <!--to make emoji dropdown to right when it open-->
+    <script>
+        $("ul").removeClass("dropdown-menu-right");
+    </script>
+    <script>
+
+        //to add emoji in comment box
+        $(".emoji").click(function(){
+            var text_field=$(this).parent().parent().parent().parent().parent().parent().parent().find(".my-text-area");
+            var cursor_pos_start=text_field[0].selectionStart;
+            var cursor_pos_end=text_field[0].selectionEnd;//to get the position of selected region in textarea
+            var len=text_field.val().length;
+            text_field.val(text_field.val().substring(0,cursor_pos_start)+$(this).text()+text_field.val().substring(cursor_pos_end,len));
+            text_field[0].setSelectionRange(cursor_pos_start+2,cursor_pos_start+2);//to set the position of cursor at the end of inserted emoji
+        });
+        //to stop the dropdown toggle while click inside the dropdown
+        $(document).on('click.bs.dropdown.data-api', '.dropdown.keep-inside-clicks-open', function (e) {
+              e.stopPropagation();
+        });
+    </script>
+    <!--script to handle emoji scroll on selection from bottom-->
+    <script>
+        $(".tosmiley").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".smiley").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+        $(".toanimal").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".animal").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+        $(".tofood").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".food").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+        $(".togame").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".game").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+        $(".toplace").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".place").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+        $(".toobject").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".object").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+        $(".tosymbol").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".symbol").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+        $(".toflag").click(function(){
+            var icons=$(this).parent().parent().find(".icons");
+            var topos=icons.find(".flag").offset().top-icons.find(".smiley").offset().top;//offset() return a object with entities left and top
+            icons.scrollTop(topos);
+        });
+    </script>
 {% endblock %}

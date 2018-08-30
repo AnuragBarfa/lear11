@@ -2,17 +2,19 @@
 
 {% block content %}
     <div class="w3-container">
-        <div class="col-md">
-            {% for subject in subject_list %}
-            <div class="w3-card-4 post col-md-3" align="center" style="margin:20px;">
+         <div class="col-md" >
+            {% for subject in subject_detail %}
+            <div class="w3-card-4 post col-md-3" align="center" style="margin:20px;display:inline-block;">
                 <header class="w3-container w3-blue">
-                    <a href="{% url 'student:all_notes_in_subject' Semester_name subject %} " style="text-decoration:none;"><h3>{{subject}}</h3></a>
+                    <a href="{% url 'student:all_notes_in_subject' Semester_name subject.0 %}" style="text-decoration:none;"><h3>{{subject.0}}</h3></a>
                 </header>
-                <div class="w3-container">
-                  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                <div class="w3-container"style="margin:10px;min-height:230px">
+                    <p>Course Name : {{subject.1}}</p>
+                    <p>Professor Name : {{subject.2}}</p>
+                    <p>Room No : {{subject.3}}</p>
                 </div>
                 <footer class="w3-container w3-blue">
-                  <h5>Credit</h5>
+                  <h3>Credit : {{subject.4}}</h3>
                 </footer>
             </div>
             {% endfor %}

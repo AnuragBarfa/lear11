@@ -117,7 +117,14 @@
     <script>
         $('.data').hide();
         $("h3").click(function(){
+            $('.data').hide();//for one table to open at one time
             $(this).parent().find('.data').toggle();
+        });
+        //for hidding all visible table when clicked at any other random point on the page
+        $(document).on('click', function (e) {
+            if ($(e.target).closest(".col-md-4").length === 0) {
+                $(".data").hide();
+            }
         });
     </script>
 {% endblock %}
