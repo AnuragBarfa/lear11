@@ -1,2 +1,3 @@
-# lear11
+# Learning Git 
+
 this is my test git project
