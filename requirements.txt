@@ -11,7 +11,7 @@ facepy==1.0.9
 Flask==0.12.2
 google-api-python-client-py3==1.2
 gunicorn==19.7.1
-html5lib==0.9999999
+html5lib==0.99999999
 httplib2==0.10.3
 idna==2.6
 itsdangerous==0.24
